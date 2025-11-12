@@ -77,6 +77,9 @@ daily_data[["date", "area1_first_pass_yield"]].to_csv(output_path, index=False)
 
 # pd.read_csv("daily_quality_control.csv") # Commenting out display for script
 
+enterprise_model.daily_quality_data.to_csv("area1_first_pass_yield.csv", index=False)
+
+
 # This data set is monolithic as the yield for each area is stored in the main cloud for the enterprise.
 # This can be used in manufacturing operation management, which is level 3 on our S95 model.
 # This is an open loop metric since it is a result before any correction is done and no action is done automatically.
