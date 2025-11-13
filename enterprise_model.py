@@ -14,9 +14,9 @@ df = pd.read_csv(StringIO(csv_data))  # convert CSV text → DataFrame
 
 columns_needed = [
     "date",
-    "line2_temperature_sensor",
-    "line2_flow_sensor",
-    "line2_pressure_sensor"
+    "polytex_area3_line2_temperature_sensor",
+    "polytex_area3_line2_flow_sensor",
+    "polytex_area3_line2_pressure_sensor"
 ]
 
 df_selected = df[columns_needed]
