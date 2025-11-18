@@ -1,6 +1,9 @@
 # edited column names to polytex_site1_area3_line2_sensor_temperature
 # this file excludes johns code as it puts out error
 # Sensor functionality data for line 2 - Doyeon
+# edited column names to polytex_site1_area3_line2_sensor_temperature
+# this file excludes johns code as it puts out error
+# Sensor functionality data for line 2 - Doyeon
 import requests
 import pandas as pd
 from io import StringIO
@@ -13,24 +16,76 @@ csv_data = response.text              # raw CSV text returned by the server
 df = pd.read_csv(StringIO(csv_data))  # convert CSV text → DataFrame
 # df.head() # Commenting out display for script
 
-columns_needed = [
-    "date",
-    "polytex_site1_area3_line1_sensor_temperature",
-    "polytex_site1_area3_line1_sensor_flow",
-    "polytex_site1_area3_line1_sensor_pressure",
-    "polytex_site1_area3_line2_sensor_temperature",
-    "polytex_site1_area3_line2_sensor_flow",
-    "polytex_site1_area3_line2_sensor_pressure",
-    "polytex_site1_area3_line3_sensor_temperature",
-    "polytex_site1_area3_line3_sensor_flow",
-    "polytex_site1_area3_line3_sensor_pressure",
-    "polytex_site1_area3_line4_sensor_temperature",
-    "polytex_site1_area3_line4_sensor_flow",
-    "polytex_site1_area3_line4_sensor_pressure",
-]
+class Asset:
+    def __init__(self, name, sensor_prefix):
+        self.name = name
+        self.sensor_prefix = sensor_prefix
+        self.data = None
 
-df_selected = df[columns_needed]
-# df_selected.head() # Commenting out display for script
+    def load_data(self, master_df):
+        columns_needed = [
+            "date",
+            f"{self.sensor_prefix}_temperature",
+            f"{self.sensor_prefix}_flow",
+            f"{self.sensor_prefix}_pressure"
+        ]
+        self.data = master_df[columns_needed].copy() # Added .copy() here to avoid SettingWithCopyWarning
+
+    def get_sensor_status(self):
+        return self.data
+
+Line1 = Asset("Line 1", "polytex_site1_area3_line1_sensor")
+Line2 = Asset("Line 2", "polytex_site1_area3_line2_sensor")
+Line3 = Asset("Line 3", "polytex_site1_area3_line3_sensor")
+Line4 = Asset("Line 4", "polytex_site1_area3_line4_sensor")
+
+# Load data into each Asset object
+Line1.load_data(df)
+Line2.load_data(df)
+Line3.load_data(df)
+Line4.load_data(df)
+
+# Now use the data attribute of each Asset object
+Line1.data["sensor_available"] = (
+    Line1.data[f"{Line1.sensor_prefix}_temperature"] &
+    Line1.data[f"{Line1.sensor_prefix}_flow"] &
+    Line1.data[f"{Line1.sensor_prefix}_pressure"]
+)
+
+
+Line2.data["sensor_available"] = (
+    Line2.data[f"{Line2.sensor_prefix}_temperature"] &
+    Line2.data[f"{Line2.sensor_prefix}_flow"] &
+    Line2.data[f"{Line2.sensor_prefix}_pressure"]
+)
+
+Line3.data["sensor_available"] = (
+    Line3.data[f"{Line3.sensor_prefix}_temperature"] &
+    Line3.data[f"{Line3.sensor_prefix}_flow"] &
+    Line3.data[f"{Line3.sensor_prefix}_pressure"]
+)
+
+Line4.data["sensor_available"] = (
+    Line4.data[f"{Line4.sensor_prefix}_temperature"] &
+    Line4.data[f"{Line4.sensor_prefix}_flow"] &
+    Line4.data[f"{Line4.sensor_prefix}_pressure"]
+)
+
+Line1.data["line1_auto_shutdown_triggered"] = ~Line1.data["sensor_available"]
+line1_auto_shutdown_events = Line1.data[Line1.data["line1_auto_shutdown_triggered"]]
+line1_auto_shutdown_events.head()
+
+Line2.data["line2_auto_shutdown_triggered"] = ~Line2.data["sensor_available"]
+line2_auto_shutdown_events = Line2.data[Line2.data["line2_auto_shutdown_triggered"]]
+line2_auto_shutdown_events.head()
+
+Line3.data["line3_auto_shutdown_triggered"] = ~Line3.data["sensor_available"]
+line3_auto_shutdown_events = Line3.data[Line3.data["line3_auto_shutdown_triggered"]]
+line3_auto_shutdown_events.head()
+
+Line4.data["line4_auto_shutdown_triggered"] = ~Line4.data["sensor_available"]
+line4_auto_shutdown_events = Line4.data[Line4.data["line4_auto_shutdown_triggered"]]
+line4_auto_shutdown_events.head()
 
 # This dataset is federated since the sensor availability for each lines are stored in each lines.
 # It can be integrated into anomaly detection on level 2 of our S95 model.
