@@ -87,6 +87,15 @@ Line4.data["line4_auto_shutdown_triggered"] = ~Line4.data["sensor_available"]
 line4_auto_shutdown_events = Line4.data[Line4.data["line4_auto_shutdown_triggered"]]
 line4_auto_shutdown_events.head()
 
+# Export each line's shutdown events as a dataset
+Line1.data.to_csv("polytex_site1_area3_line1_sensor_data.csv", index=False)
+Line2.data.to_csv("polytex_site1_area3_line2_sensor_data.csv", index=False)
+Line3.data.to_csv("polytex_site1_area3_line3_sensor_data.csv", index=False)
+Line4.data.to_csv("polytex_site1_area3_line4_sensor_data.csv", index=False)
+
+print("EDM export complete.")
+
+
 # This dataset is federated since the sensor availability for each lines are stored in each lines.
 # It can be integrated into anomaly detection on level 2 of our S95 model.
 # This is a closed loop use case since the operation is automatically paused and recorded when the sensor does not work and maintenance is alerted real-time.
